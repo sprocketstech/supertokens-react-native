@@ -1,4 +1,3 @@
-import { URL } from "react-native-url-polyfill";
 import { RecipeInterface, NormalisedInputType } from "./types";
 import AuthHttpRequest, { onUnauthorisedResponse } from "./fetch";
 import FrontToken from "./frontToken";
@@ -7,6 +6,7 @@ import { interceptorFunctionRequestFulfilled, responseErrorInterceptor, response
 import { SuperTokensGeneralError } from "./error";
 import { getLocalSessionState, normaliseSessionScopeOrThrowError, normaliseURLDomainOrThrowError } from "./utils";
 import { logDebugMessage } from "./logger";
+import { parseUrl } from "./parseUrl";
 
 export default function RecipeImplementation(): RecipeInterface {
     return {
@@ -165,13 +165,13 @@ export default function RecipeImplementation(): RecipeInterface {
             }
 
             toCheckUrl = normaliseURLDomainOrThrowError(toCheckUrl);
-            let urlObj = new URL(toCheckUrl);
+            let urlObj = parseUrl(toCheckUrl);
             let domain = urlObj.hostname;
             let apiDomainAndInputDomainMatch = false;
             if (apiDomain !== "") {
                 // we have the "" check cause in tests, we pass "" in lots of cases.
                 apiDomain = normaliseURLDomainOrThrowError(apiDomain);
-                let apiUrlObj = new URL(apiDomain);
+                let apiUrlObj = parseUrl(apiDomain);
                 apiDomainAndInputDomainMatch = domain === apiUrlObj.hostname;
             }
             if (sessionTokenBackendDomain === undefined || apiDomainAndInputDomainMatch) {

@@ -12,7 +12,8 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-import { URL } from "react-native-url-polyfill";
+
+import { parseUrl } from "./parseUrl";
 
 export default class NormalisedURLPath {
     private value: string;
@@ -40,8 +41,7 @@ function normaliseURLPathOrThrowError(input: string): string {
         if (!input.startsWith("http://") && !input.startsWith("https://")) {
             throw new Error("converting to proper URL");
         }
-        // @ts-ignore (Typescript complains that URL does not expect a parameter in constructor even though it does for react-native-url-polyfill)
-        const urlObj: any = new URL(input);
+        const urlObj: any = parseUrl(input);
         input = urlObj.pathname;
 
         if (input.charAt(input.length - 1) === "/") {
@@ -70,8 +70,7 @@ function normaliseURLPathOrThrowError(input: string): string {
     // at this point, we should be able to convert it into a fake URL and recursively call this function.
     try {
         // test that we can convert this to prevent an infinite loop
-        // @ts-ignore (Typescript complains that URL does not expect a parameter in constructor even though it does for react-native-url-polyfill)
-        new URL("http://example.com" + input);
+        parseUrl("http://example.com" + input);
         return normaliseURLPathOrThrowError("http://example.com" + input);
     } catch (err) {
         throw new Error("Please provide a valid URL path");
@@ -85,14 +84,12 @@ function domainGiven(input: string): boolean {
     }
 
     try {
-        // @ts-ignore (Typescript complains that URL does not expect a parameter in constructor even though it does for react-native-url-polyfill)
-        const url: any = new URL(input);
+        const url: any = parseUrl(input);
         return url.hostname.indexOf(".") !== -1;
     } catch (e) {}
 
     try {
-        // @ts-ignore (Typescript complains that URL does not expect a parameter in constructor even though it does for react-native-url-polyfill)
-        const url: any = new URL("http://" + input);
+        const url: any = parseUrl("http://" + input);
         return url.hostname.indexOf(".") !== -1;
     } catch (e) {}
 
